@@ -1,154 +1,535 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <!-- Ensure proper scaling and full-screen friendly viewport on mobile -->
-  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
-  <title>KiPi re.web</title>
+  <meta charset="UTF-8" />
+  <meta 
+    name="viewport"
+    content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no"
+  />
+  <meta name="screen-orientation" content="landscape" />
+  <title>KiPi Runner</title>
   <style>
-    /* Remove default margins and disable overflow to prevent scrollbars */
-    body {
+    * {
+      box-sizing: border-box;
       margin: 0;
       padding: 0;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      touch-action: manipulation;
+    }
+    
+    body {
+      margin: 0;
       overflow: hidden;
+      background: #1a1a2e;
+      color: white;
+      -webkit-tap-highlight-color: transparent;
     }
 
-    /* Style the canvas to fill the window, set a background color,
-       and disable touch zoom/pinch for a smoother mobile experience */
     canvas {
       display: block;
       touch-action: none;
+    }
+
+    .overlay {
+      position: absolute;
+      top: 0; 
+      left: 0;
+      width: 100%; 
+      height: 100%;
+      background: linear-gradient(135deg, #1a1a2e, #16213e);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      z-index: 10;
+      text-align: center;
+      padding: 20px;
+      opacity: 1;
+      transition: opacity 0.5s ease;
+    }
+
+    .overlay.hidden {
+      opacity: 0;
+      pointer-events: none;
+    }
+
+    .title {
+      font-size: 3.5rem;
+      margin-bottom: 20px;
+      color: #0fcc45;
+      text-shadow: 0 0 10px rgba(15, 204, 69, 0.7);
+      letter-spacing: 2px;
+    }
+
+    .subtitle {
+      font-size: 1.5rem;
+      margin-bottom: 40px;
+      color: #e6e6e6;
+      max-width: 500px;
+    }
+
+    .instructions {
+      background: rgba(255, 255, 255, 0.1);
+      border-radius: 15px;
+      padding: 25px;
+      margin: 20px 0;
+      max-width: 500px;
+      text-align: left;
+    }
+
+    .instructions h3 {
+      color: #4ecca3;
+      margin-bottom: 15px;
+      font-size: 1.4rem;
+    }
+
+    .instructions ul {
+      list-style-type: none;
+      padding-left: 20px;
+    }
+
+    .instructions li {
+      margin: 12px 0;
+      display: flex;
+      align-items: flex-start;
+    }
+
+    .instructions li::before {
+      content: "•";
+      color: #0fcc45;
+      font-weight: bold;
+      display: inline-block;
+      width: 20px;
+      font-size: 1.5rem;
+    }
+
+    .start-btn {
+      background: linear-gradient(to right, #0fcc45, #4ecca3);
+      color: white;
+      border: none;
+      padding: 15px 50px;
+      font-size: 1.4rem;
+      border-radius: 50px;
+      cursor: pointer;
+      margin-top: 20px;
+      box-shadow: 0 5px 15px rgba(15, 204, 69, 0.4);
+      transition: all 0.3s ease;
+      font-weight: bold;
+    }
+
+    .start-btn:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 8px 20px rgba(15, 204, 69, 0.6);
+    }
+
+    #rotateNotice {
+      position: absolute;
+      top: 0; 
+      left: 0;
+      width: 100%; 
+      height: 100%;
+      background: linear-gradient(135deg, #16213e, #0f3460);
+      display: none;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      padding: 20px;
+      z-index: 20;
+      font-size: calc(16px + 2vw);
+      line-height: 1.5;
+    }
+
+    .rotate-icon {
+      font-size: 5rem;
+      margin-bottom: 30px;
+      animation: rotate 2s infinite linear;
+      color: #0fcc45;
+    }
+
+    @keyframes rotate {
+      from { transform: rotate(0deg); }
+      to { transform: rotate(90deg); }
+    }
+
+    .game-stats {
+      position: absolute;
+      top: 20px;
+      left: 20px;
+      z-index: 5;
+      pointer-events: none;
+    }
+
+    .stat {
+      font-size: 1.2rem;
+      margin-bottom: 10px;
+      background: rgba(0, 0, 0, 0.5);
+      padding: 8px 15px;
+      border-radius: 10px;
+      display: inline-block;
+    }
+
+    .credit {
+      position: absolute;
+      bottom: 20px;
+      right: 20px;
+      font-size: 1rem;
+      color: rgba(255, 255, 255, 0.7);
+      background: rgba(0, 0, 0, 0.3);
+      padding: 5px 10px;
+      border-radius: 5px;
+      pointer-events: none;
+    }
+
+    .controls {
+      position: absolute;
+      bottom: 20px;
+      left: 0;
+      width: 100%;
+      display: flex;
+      justify-content: center;
+      gap: 20px;
+      z-index: 5;
+    }
+
+    .control-btn {
+      width: 70px;
+      height: 70px;
+      border-radius: 50%;
+      background: rgba(255, 255, 255, 0.2);
+      border: 3px solid rgba(255, 255, 255, 0.5);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.8rem;
+      color: white;
+      cursor: pointer;
+      user-select: none;
+    }
+
+    .jump-btn {
+      background: rgba(15, 204, 69, 0.3);
+    }
+
+    .volume-control {
+      position: absolute;
+      top: 20px;
+      right: 20px;
+      z-index: 5;
+      background: rgba(0, 0, 0, 0.5);
+      padding: 5px 10px;
+      border-radius: 20px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .volume-btn {
+      width: 30px;
+      height: 30px;
+      border-radius: 50%;
+      background: rgba(255, 255, 255, 0.2);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.2rem;
+      color: white;
+      cursor: pointer;
+    }
+
+    .touch-notice {
+      position: absolute;
+      bottom: 100px;
+      left: 0;
+      width: 100%;
+      text-align: center;
+      font-size: 1.2rem;
+      color: rgba(255, 255, 255, 0.7);
+      pointer-events: none;
+      animation: pulse 1.5s infinite;
+    }
+
+    @keyframes pulse {
+      0% { opacity: 0.5; }
+      50% { opacity: 1; }
+      100% { opacity: 0.5; }
+    }
+
+    @media (max-width: 768px) {
+      .title {
+        font-size: 2.5rem;
+      }
+      
+      .subtitle {
+        font-size: 1.2rem;
+      }
+      
+      .start-btn {
+        padding: 12px 40px;
+        font-size: 1.2rem;
+      }
+      
+      .instructions {
+        padding: 15px;
+      }
+      
+      .control-btn {
+        width: 60px;
+        height: 60px;
+        font-size: 1.5rem;
+      }
+      
+      .touch-notice {
+        font-size: 1rem;
+        bottom: 80px;
+      }
     }
   </style>
 </head>
 <body>
   <canvas id="gameCanvas"></canvas>
+  <audio id="bgMusic" loop preload="auto">
+    <source src="engine.mp3" type="audio/mpeg">
+  </audio>
+
+  <div class="overlay" id="startOverlay">
+    <h1 class="title">KiPi Runner</h1>
+    <p class="subtitle">Run, jump, and survive as long as you can!</p>
+    
+    <div class="instructions">
+      <h3>How to Play</h3>
+      <ul>
+        <li><strong>Tap anywhere on the screen</strong> to jump over obstacles</li>
+        <li>Avoid hitting obstacles to survive</li>
+        <li>Game speed increases over time</li>
+        <li>Longer survival = higher score!</li>
+      </ul>
+    </div>
+    
+    <button class="start-btn" onclick="startGame()">START GAME</button>
+  </div>
+
+  <div id="rotateNotice">
+    <div class="rotate-icon">↻</div>
+    <p>Please rotate your device to landscape mode</p>
+    <p>Then tap to continue</p>
+  </div>
+
+  <div class="game-stats">
+    <div class="stat" id="scoreDisplay">Score: 0</div>
+    <div class="stat" id="speedDisplay">Speed: 1.00</div>
+  </div>
+
+  <div class="volume-control">
+    <div class="volume-btn" id="volDown">-</div>
+    <div class="volume-btn" id="volUp">+</div>
+  </div>
+
+  <div class="touch-notice" id="touchNotice">Tap anywhere to jump!</div>
+  
+  <div class="credit">Developed by Toha</div>
+  
+  <div class="controls">
+    <div class="control-btn jump-btn" id="jumpBtn">↑</div>
+  </div>
+
   <script>
     const canvas = document.getElementById("gameCanvas");
-    const ctx    = canvas.getContext("2d");
+    const ctx = canvas.getContext("2d");
+    const startOverlay = document.getElementById("startOverlay");
+    const rotateNotice = document.getElementById("rotateNotice");
+    const scoreDisplay = document.getElementById("scoreDisplay");
+    const speedDisplay = document.getElementById("speedDisplay");
+    const jumpBtn = document.getElementById("jumpBtn");
+    const volDownBtn = document.getElementById("volDown");
+    const volUpBtn = document.getElementById("volUp");
+    const bgMusic = document.getElementById("bgMusic");
+    const touchNotice = document.getElementById("touchNotice");
+    
+    // Set initial volume to 50%
+    bgMusic.volume = 0.5;
+    
+    // Hide touch notice initially
+    touchNotice.style.display = "none";
 
-    // Make the canvas fill the window
-    function resizeCanvas() {
-      canvas.width  = window.innerWidth;
+    function resize() {
+      canvas.width = window.innerWidth;
       canvas.height = window.innerHeight;
     }
-    resizeCanvas();
-    window.addEventListener("resize", resizeCanvas);
+    window.addEventListener("resize", resize);
+    resize();
 
-    // --- Fullscreen on first touch (mobile) ---
-    function requestFullScreen() {
-      if (canvas.requestFullscreen)      canvas.requestFullscreen();
-      else if (canvas.webkitRequestFullscreen) canvas.webkitRequestFullscreen();
-      else if (canvas.msRequestFullscreen)     canvas.msRequestFullscreen();
-    }
-    function handleMobileFullScreen(e) {
-      if (!document.fullscreenElement &&
-          !document.webkitFullscreenElement &&
-          !document.msFullscreenElement) {
-        requestFullScreen();
+    function goFullScreenAndLock() {
+      const el = document.documentElement;
+      const promise =
+        el.requestFullscreen?.() ||
+        el.webkitRequestFullscreen?.() ||
+        el.msRequestFullscreen?.();
+
+      if (promise) {
+        promise.then(() => {
+          if (screen.orientation && screen.orientation.lock) {
+            screen.orientation.lock("landscape").catch(err => {
+              console.warn("Orientation lock failed:", err);
+            });
+          }
+        }).catch(err => {
+          console.warn("Fullscreen request failed:", err);
+        });
       }
-      document.removeEventListener("touchstart", handleMobileFullScreen);
     }
-    document.addEventListener("touchstart", handleMobileFullScreen);
 
-    // --- Player setup ---
+    function checkOrientation() {
+      const isPortrait = window.innerHeight > window.innerWidth;
+      rotateNotice.style.display = isPortrait ? "flex" : "none";
+      
+      // Auto-start in landscape if in WebView APK
+      if (!isPortrait && isWebViewAPK() && !gameRunning) {
+        setTimeout(startGame, 500);
+      }
+    }
+
+    // Detect if we're in a WebView APK environment
+    function isWebViewAPK() {
+      const userAgent = navigator.userAgent.toLowerCase();
+      // Check for Android WebView or iOS UIWebView/WKWebView
+      return (userAgent.includes('wv') || 
+             (userAgent.includes('android') && !userAgent.includes('chrome')) || 
+             (userAgent.includes('iphone') && userAgent.includes('safari') && !userAgent.includes('chrome')));
+    }
+
+    window.addEventListener("orientationchange", checkOrientation);
+    window.addEventListener("resize", checkOrientation);
+
+    let gameRunning = false,
+        lastTime = 0,
+        score = 0,
+        gameSpeed = 1,
+        obstacles = [],
+        obstacleTimer = 0;
+
     const player = {
-      x: 50,
-      y: canvas.height - 150,
-      width: 50,
-      height: 50,
+      x: 50, y: 0,
+      width: 50, height: 50,
       velocityY: 0,
       jumpForce: 15,
       gravity: 0.7,
       grounded: false
     };
 
-    // --- Obstacles ---
-    let obstacles      = [];
-    let obstacleTimer  = 0;
-    const obstacleInterval = 1500; // ms
-
-    // --- Game control ---
-    let lastTime    = 0;
-    let gameRunning = true;
-    let score       = 0;
-    let gameSpeed   = 1;
-
-    // --- Cloud background setup ---
-    const clouds      = [];
-    const cloudCount  = 8;
-    const cloudSpeed  = 0.3; // base speed, multiplied by gameSpeed
+    const clouds = [];
+    const cloudCount = 8;
     for (let i = 0; i < cloudCount; i++) {
       clouds.push({
         x: Math.random() * canvas.width,
-        y: Math.random() * (canvas.height * 0.5),
+        y: Math.random() * canvas.height * 0.5,
         scale: 0.5 + Math.random() * 0.8
       });
     }
 
-    // --- Main game loop ---
-    function gameLoop(timestamp) {
+    function startGame() {
+      if (gameRunning) return;
+      
+      // Auto-rotate on mobile
+      if (isMobile()) {
+        goFullScreenAndLock();
+      }
+      
+      gameRunning = true;
+      lastTime = 0;
+      score = 0;
+      gameSpeed = 1;
+      obstacles = [];
+      obstacleTimer = 0;
+      player.y = canvas.height - 150;
+      player.velocityY = 0;
+      player.grounded = false;
+
+      // Show touch notice on mobile
+      touchNotice.style.display = isMobile() ? "block" : "none";
+
+      // Start background music
+      bgMusic.currentTime = 0;
+      bgMusic.play().catch(e => {
+        console.log("Autoplay blocked, user interaction required");
+      });
+
+      startOverlay.classList.add("hidden");
+
+      requestAnimationFrame(gameLoop);
+    }
+    
+    function isMobile() {
+      return /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+    }
+
+    function gameLoop(ts) {
       if (!gameRunning) return;
+      if (!lastTime) lastTime = ts;
+      const delta = ts - lastTime;
+      lastTime = ts;
 
-      if (!lastTime) lastTime = timestamp;
-      const deltaTime = timestamp - lastTime;
-      lastTime = timestamp;
+      gameSpeed += delta * 0.00005;
+      score += gameSpeed * delta * 0.01;
+      
+      // Update UI stats
+      scoreDisplay.textContent = `Score: ${Math.floor(score)}`;
+      speedDisplay.textContent = `Speed: ${gameSpeed.toFixed(2)}`;
 
-      // speed & score
-      gameSpeed += deltaTime * 0.00005;
-      score     += gameSpeed * deltaTime * 0.01;
-
-      // --- Draw animated sky ---
-      // 1) Sky gradient
-      const skyGrad = ctx.createLinearGradient(0, 0, 0, canvas.height);
-      skyGrad.addColorStop(0, "#87CEEB");   // top: lighter blue
-      skyGrad.addColorStop(1, "#b0e0e6");   // bottom: pale blue
-      ctx.fillStyle = skyGrad;
+      // Sky gradient
+      const grad = ctx.createLinearGradient(0, 0, 0, canvas.height);
+      grad.addColorStop(0, "#87CEEB");
+      grad.addColorStop(1, "#b0e0e6");
+      ctx.fillStyle = grad;
       ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-      // 2) Moving clouds
-      clouds.forEach(cloud => {
-        cloud.x -= cloudSpeed * gameSpeed;
-        if (cloud.x < -200 * cloud.scale) {
-          cloud.x = canvas.width + 50;
-          cloud.y = Math.random() * (canvas.height * 0.5);
+      // Draw clouds
+      clouds.forEach(c => {
+        c.x -= 0.3 * gameSpeed;
+        if (c.x < -200 * c.scale) {
+          c.x = canvas.width + 50;
+          c.y = Math.random() * canvas.height * 0.5;
         }
-
-        // draw a simple cloud shape
         ctx.fillStyle = "rgba(255,255,255,0.8)";
         ctx.beginPath();
-        const cw = 150 * cloud.scale;
-        const ch = 60  * cloud.scale;
-        ctx.ellipse(cloud.x, cloud.y, cw, ch, 0, 0, Math.PI * 2);
-        ctx.ellipse(cloud.x - cw * 0.6, cloud.y + ch * 0.1, cw * 0.7, ch * 0.7, 0, 0, Math.PI * 2);
-        ctx.ellipse(cloud.x + cw * 0.6, cloud.y + ch * 0.1, cw * 0.7, ch * 0.7, 0, 0, Math.PI * 2);
+        const cw = 150 * c.scale, ch = 60 * c.scale;
+        ctx.ellipse(c.x, c.y, cw, ch, 0, 0, 2 * Math.PI);
+        ctx.ellipse(c.x - cw * 0.6, c.y + ch * 0.1, cw * 0.7, ch * 0.7, 0, 0, 2 * Math.PI);
+        ctx.ellipse(c.x + cw * 0.6, c.y + ch * 0.1, cw * 0.7, ch * 0.7, 0, 0, 2 * Math.PI);
         ctx.fill();
       });
 
-      // --- Apply gravity & update player pos ---
+      // Player physics
       player.velocityY += player.gravity;
-      player.y        += player.velocityY;
-
-      // ground collision
+      player.y += player.velocityY;
       if (player.y + player.height > canvas.height - 100) {
-        player.y        = canvas.height - 100 - player.height;
+        player.y = canvas.height - 100 - player.height;
         player.velocityY = 0;
-        player.grounded  = true;
+        player.grounded = true;
       } else {
         player.grounded = false;
       }
 
-      // --- Draw ground ---
+      // Ground
       ctx.fillStyle = "#654321";
       ctx.fillRect(0, canvas.height - 100, canvas.width, 100);
+      
+      // Draw grass on top of ground
+      ctx.fillStyle = "#2a8a5c";
+      ctx.fillRect(0, canvas.height - 100, canvas.width, 10);
 
-      // --- Draw player ---
+      // Player character
       ctx.fillStyle = "#ff0000";
       ctx.fillRect(player.x, player.y, player.width, player.height);
+      
+      // Player details
+      ctx.fillStyle = "#333";
+      ctx.fillRect(player.x + 10, player.y + 10, 15, 15); // eye
+      ctx.fillRect(player.x + 25, player.y + 30, 20, 10); // mouth
 
-      // --- Obstacles spawn & draw ---
-      obstacleTimer += deltaTime;
-      if (obstacleTimer > obstacleInterval) {
+      // Generate obstacles
+      obstacleTimer += delta;
+      if (obstacleTimer > 1500) {
         const h = 40 + Math.random() * 30;
         obstacles.push({
           x: canvas.width,
@@ -159,88 +540,173 @@
         obstacleTimer = 0;
       }
 
+      // Process obstacles
       for (let i = obstacles.length - 1; i >= 0; i--) {
-        const obs = obstacles[i];
-        obs.x -= 6 * gameSpeed;
-
-        // collision?
-        if (
-          player.x < obs.x + obs.width &&
-          player.x + player.width > obs.x &&
-          player.y < obs.y + obs.height &&
-          player.y + player.height > obs.y
-        ) {
+        const o = obstacles[i];
+        o.x -= 6 * gameSpeed;
+        
+        // Collision detection
+        if (player.x < o.x + o.width &&
+            player.x + player.width > o.x &&
+            player.y < o.y + o.height &&
+            player.y + player.height > o.y) {
           return gameOver();
         }
-
-        if (obs.x + obs.width < 0) {
+        
+        // Remove if off screen
+        if (o.x + o.width < 0) {
           obstacles.splice(i, 1);
         } else {
-          ctx.fillStyle = "#000";
-          ctx.fillRect(obs.x, obs.y, obs.width, obs.height);
+          // Draw obstacle
+          ctx.fillStyle = "#8B4513";
+          ctx.fillRect(o.x, o.y, o.width, o.height);
+          
+          // Draw obstacle top
+          ctx.fillStyle = "#5d2900";
+          ctx.fillRect(o.x, o.y, o.width, 10);
         }
       }
-
-      // --- HUD: score & speed ---
-      ctx.fillStyle = "#fff";
-      ctx.font = "24px sans-serif";
-      ctx.fillText("Score: " + Math.floor(score), 20, 40);
-      ctx.fillText("Speed: " + gameSpeed.toFixed(2), 20, 70);
-
-      // credit
-      ctx.fillStyle = "rgba(255, 255, 255, 0.7)";
-      ctx.font = "16px sans-serif";
-      const credit = "Developed by Toha";
-      const tw = ctx.measureText(credit).width;
-      ctx.fillText(credit, canvas.width - tw - 20, canvas.height - 20);
 
       requestAnimationFrame(gameLoop);
     }
 
-    // --- Input handlers ---
-    window.addEventListener("keydown", e => {
-      if (e.code === "Space" && player.grounded) {
-        player.velocityY = -player.jumpForce;
-        player.grounded = false;
-      }
-    });
-
-    window.addEventListener("touchstart", e => {
-      e.preventDefault();
+    // Jump function
+    function jump() {
       if (player.grounded) {
         player.velocityY = -player.jumpForce;
         player.grounded = false;
+        
+        // Add jump effect
+        ctx.fillStyle = "rgba(15, 204, 69, 0.3)";
+        ctx.beginPath();
+        ctx.arc(player.x + player.width/2, player.y + player.height, 30, 0, Math.PI * 2);
+        ctx.fill();
+      }
+    }
+
+    // Full-screen touch control
+    canvas.addEventListener("touchstart", function(e) {
+      e.preventDefault();
+      
+      // Check if touch is on UI elements
+      const rect = canvas.getBoundingClientRect();
+      const touchX = e.touches[0].clientX - rect.left;
+      const touchY = e.touches[0].clientY - rect.top;
+      
+      // Define safe zones where touch doesn't trigger jump
+      const isInVolumeControl = touchX > canvas.width - 100 && touchY < 100;
+      const isInStatsArea = touchX < 200 && touchY < 100;
+      
+      if (!isInVolumeControl && !isInStatsArea) {
+        jump();
       }
     }, { passive: false });
 
-    // --- Game Over & Reset ---
+    // Full-screen click control for desktop
+    canvas.addEventListener("click", function(e) {
+      const rect = canvas.getBoundingClientRect();
+      const clickX = e.clientX - rect.left;
+      const clickY = e.clientY - rect.top;
+      
+      // Define safe zones where click doesn't trigger jump
+      const isInVolumeControl = clickX > canvas.width - 100 && clickY < 100;
+      const isInStatsArea = clickX < 200 && clickY < 100;
+      
+      if (!isInVolumeControl && !isInStatsArea) {
+        jump();
+      }
+    });
+
+    // Button controls
+    jumpBtn.addEventListener("touchstart", e => {
+      e.preventDefault();
+      jump();
+    }, { passive: false });
+    
+    jumpBtn.addEventListener("mousedown", e => {
+      jump();
+    });
+
+    // Volume controls
+    volDownBtn.addEventListener("click", () => {
+      if (bgMusic.volume > 0.1) {
+        bgMusic.volume -= 0.1;
+      } else {
+        bgMusic.volume = 0;
+      }
+    });
+    
+    volUpBtn.addEventListener("click", () => {
+      if (bgMusic.volume < 0.9) {
+        bgMusic.volume += 0.1;
+      } else {
+        bgMusic.volume = 1;
+      }
+    });
+
     function gameOver() {
       gameRunning = false;
-      ctx.fillStyle = "rgba(0, 0, 0, 0.5)";
+      
+      // Hide touch notice
+      touchNotice.style.display = "none";
+      
+      // Stop background music
+      bgMusic.pause();
+
+      // Show game over overlay
+      ctx.fillStyle = "rgba(0, 0, 0, 0.7)";
       ctx.fillRect(0, 0, canvas.width, canvas.height);
+      
       ctx.fillStyle = "#fff";
-      ctx.font = "48px sans-serif";
-      ctx.fillText("Game Over", canvas.width / 2 - 100, canvas.height / 2);
-
-      setTimeout(() => {
-        resetGame();
-        gameRunning = true;
-        lastTime = 0;
-        requestAnimationFrame(gameLoop);
-      }, 2000);
+      ctx.font = "bold 48px sans-serif";
+      ctx.textAlign = "center";
+      ctx.fillText("GAME OVER", canvas.width / 2, canvas.height / 2 - 40);
+      
+      ctx.font = "36px sans-serif";
+      ctx.fillText(`Score: ${Math.floor(score)}`, canvas.width / 2, canvas.height / 2 + 20);
+      
+      ctx.font = "24px sans-serif";
+      ctx.fillText("Tap anywhere to restart", canvas.width / 2, canvas.height / 2 + 80);
+      
+      // Set up restart
+      canvas.addEventListener("click", restartGame);
+      canvas.addEventListener("touchstart", restartGame);
+    }
+    
+    function restartGame(e) {
+      // Prevent restart if touch is on UI elements
+      const rect = canvas.getBoundingClientRect();
+      let touchX, touchY;
+      
+      if (e.type === "touchstart") {
+        touchX = e.touches[0].clientX - rect.left;
+        touchY = e.touches[0].clientY - rect.top;
+      } else {
+        touchX = e.clientX - rect.left;
+        touchY = e.clientY - rect.top;
+      }
+      
+      // Define safe zones where touch doesn't trigger restart
+      const isInVolumeControl = touchX > canvas.width - 100 && touchY < 100;
+      const isInStatsArea = touchX < 200 && touchY < 100;
+      
+      if (!isInVolumeControl && !isInStatsArea) {
+        canvas.removeEventListener("click", restartGame);
+        canvas.removeEventListener("touchstart", restartGame);
+        startGame();
+      }
     }
 
-    function resetGame() {
-      player.y        = canvas.height - 150;
-      player.velocityY = 0;
-      obstacles        = [];
-      obstacleTimer    = 0;
-      score            = 0;
-      gameSpeed        = 1;
+    // Initial setup
+    checkOrientation();
+    
+    // Auto-start if in WebView APK and in landscape
+    if (isWebViewAPK()) {
+      const isPortrait = window.innerHeight > window.innerWidth;
+      if (!isPortrait) {
+        setTimeout(startGame, 1000);
+      }
     }
-
-    // Start
-    requestAnimationFrame(gameLoop);
   </script>
 </body>
 </html>
