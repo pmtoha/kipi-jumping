@@ -1,14 +1,275 @@
-/* Remove default margins and disable overflow to prevent scrollbars */
-body {
-  margin: 0;
-  padding: 0;
-  overflow: hidden;
-}
+ * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      touch-action: manipulation;
+    }
+    
+    body {
+      margin: 0;
+      overflow: hidden;
+      background: #1a1a2e;
+      color: white;
+      -webkit-tap-highlight-color: transparent;
+    }
 
-/* Style the canvas to fill the window, set a background color,
-   and disable touch zoom/pinch for a smoother mobile experience */
-canvas {
-  background: #7ec850;
-  display: block;
-  touch-action: none;
-}
+    canvas {
+      display: block;
+      touch-action: none;
+    }
+
+    .overlay {
+      position: absolute;
+      top: 0; 
+      left: 0;
+      width: 100%; 
+      height: 100%;
+      background: linear-gradient(135deg, #1a1a2e, #16213e);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      z-index: 10;
+      text-align: center;
+      padding: 20px;
+      opacity: 1;
+      transition: opacity 0.5s ease;
+    }
+
+    .overlay.hidden {
+      opacity: 0;
+      pointer-events: none;
+    }
+
+    .title {
+      font-size: 3.5rem;
+      margin-bottom: 20px;
+      color: #0fcc45;
+      text-shadow: 0 0 10px rgba(15, 204, 69, 0.7);
+      letter-spacing: 2px;
+    }
+
+    .subtitle {
+      font-size: 1.5rem;
+      margin-bottom: 40px;
+      color: #e6e6e6;
+      max-width: 500px;
+    }
+
+    .instructions {
+      background: rgba(255, 255, 255, 0.1);
+      border-radius: 15px;
+      padding: 25px;
+      margin: 20px 0;
+      max-width: 500px;
+      text-align: left;
+    }
+
+    .instructions h3 {
+      color: #4ecca3;
+      margin-bottom: 15px;
+      font-size: 1.4rem;
+    }
+
+    .instructions ul {
+      list-style-type: none;
+      padding-left: 20px;
+    }
+
+    .instructions li {
+      margin: 12px 0;
+      display: flex;
+      align-items: flex-start;
+    }
+
+    .instructions li::before {
+      content: "•";
+      color: #0fcc45;
+      font-weight: bold;
+      display: inline-block;
+      width: 20px;
+      font-size: 1.5rem;
+    }
+
+    .start-btn {
+      background: linear-gradient(to right, #0fcc45, #4ecca3);
+      color: white;
+      border: none;
+      padding: 15px 50px;
+      font-size: 1.4rem;
+      border-radius: 50px;
+      cursor: pointer;
+      margin-top: 20px;
+      box-shadow: 0 5px 15px rgba(15, 204, 69, 0.4);
+      transition: all 0.3s ease;
+      font-weight: bold;
+    }
+
+    .start-btn:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 8px 20px rgba(15, 204, 69, 0.6);
+    }
+
+    #rotateNotice {
+      position: absolute;
+      top: 0; 
+      left: 0;
+      width: 100%; 
+      height: 100%;
+      background: linear-gradient(135deg, #16213e, #0f3460);
+      display: none;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      padding: 20px;
+      z-index: 20;
+      font-size: calc(16px + 2vw);
+      line-height: 1.5;
+    }
+
+    .rotate-icon {
+      font-size: 5rem;
+      margin-bottom: 30px;
+      animation: rotate 2s infinite linear;
+      color: #0fcc45;
+    }
+
+    @keyframes rotate {
+      from { transform: rotate(0deg); }
+      to { transform: rotate(90deg); }
+    }
+
+    .game-stats {
+      position: absolute;
+      top: 20px;
+      left: 20px;
+      z-index: 5;
+      pointer-events: none;
+    }
+
+    .stat {
+      font-size: 1.2rem;
+      margin-bottom: 10px;
+      background: rgba(0, 0, 0, 0.5);
+      padding: 8px 15px;
+      border-radius: 10px;
+      display: inline-block;
+    }
+
+    .credit {
+      position: absolute;
+      bottom: 20px;
+      right: 20px;
+      font-size: 1rem;
+      color: rgba(255, 255, 255, 0.7);
+      background: rgba(0, 0, 0, 0.3);
+      padding: 5px 10px;
+      border-radius: 5px;
+      pointer-events: none;
+    }
+
+    .controls {
+      position: absolute;
+      bottom: 20px;
+      left: 0;
+      width: 100%;
+      display: flex;
+      justify-content: center;
+      gap: 20px;
+      z-index: 5;
+    }
+
+    .control-btn {
+      width: 70px;
+      height: 70px;
+      border-radius: 50%;
+      background: rgba(255, 255, 255, 0.2);
+      border: 3px solid rgba(255, 255, 255, 0.5);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.8rem;
+      color: white;
+      cursor: pointer;
+      user-select: none;
+    }
+
+    .jump-btn {
+      background: rgba(15, 204, 69, 0.3);
+    }
+
+    .volume-control {
+      position: absolute;
+      top: 20px;
+      right: 20px;
+      z-index: 5;
+      background: rgba(0, 0, 0, 0.5);
+      padding: 5px 10px;
+      border-radius: 20px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .volume-btn {
+      width: 30px;
+      height: 30px;
+      border-radius: 50%;
+      background: rgba(255, 255, 255, 0.2);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.2rem;
+      color: white;
+      cursor: pointer;
+    }
+
+    .touch-notice {
+      position: absolute;
+      bottom: 100px;
+      left: 0;
+      width: 100%;
+      text-align: center;
+      font-size: 1.2rem;
+      color: rgba(255, 255, 255, 0.7);
+      pointer-events: none;
+      animation: pulse 1.5s infinite;
+    }
+
+    @keyframes pulse {
+      0% { opacity: 0.5; }
+      50% { opacity: 1; }
+      100% { opacity: 0.5; }
+    }
+
+    @media (max-width: 768px) {
+      .title {
+        font-size: 2.5rem;
+      }
+      
+      .subtitle {
+        font-size: 1.2rem;
+      }
+      
+      .start-btn {
+        padding: 12px 40px;
+        font-size: 1.2rem;
+      }
+      
+      .instructions {
+        padding: 15px;
+      }
+      
+      .control-btn {
+        width: 60px;
+        height: 60px;
+        font-size: 1.5rem;
+      }
+      
+      .touch-notice {
+        font-size: 1rem;
+        bottom: 80px;
+      }
+    }
