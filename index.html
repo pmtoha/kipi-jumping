@@ -1,62 +1,60 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta 
-    name="viewport"
-    content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no"
-  />
-  <meta name="screen-orientation" content="landscape" />
-  <title>KiPi Runner</title>
-  <link rel="stylesheet" href="styles.css" />
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Calculator</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <link rel="stylesheet" href="styles.css" />
+
 </head>
 <body>
-  <canvas id="gameCanvas"></canvas>
-  <audio id="bgMusic" loop preload="auto">
-    <source src="engine.mp3" type="audio/mpeg">
-  </audio>
+    <div class="calculator-container">
+        <div class="calculator-header">
+            <div class="app-title">Calculator</div>
+            <button class="theme-toggle" id="themeToggle">
+                <i class="fas fa-moon"></i>
+            </button>
+        </div>
+        
+        <div class="display">
+            <div class="previous-operand"></div>
+            <div class="current-operand">0</div>
+        </div>
+        
+        <div class="buttons-grid">
+            <button class="clear span-two">AC</button>
+            <button class="delete">DEL</button>
+            <button class="operation">÷</button>
+            
+            <button>7</button>
+            <button>8</button>
+            <button>9</button>
+            <button class="operation">×</button>
+            
+            <button>4</button>
+            <button>5</button>
+            <button>6</button>
+            <button class="operation">-</button>
+            
+            <button>1</button>
+            <button>2</button>
+            <button>3</button>
+            <button class="operation">+</button>
+            
+            <button class="span-two">0</button>
+            <button>.</button>
+            <button class="equals">=</button>
+        </div>
+        
+        <div class="calculator-footer">
+            <div class="memory-indicator" id="memoryIndicator">
+                <i class="fas fa-memory"></i> <span></span>
+        </div>
 
-  <div class="overlay" id="startOverlay">
-    <h1 class="title">KiPi Runner</h1>
-    <p class="subtitle">Run, jump, and survive as long as you can!</p>
     
-    <div class="instructions">
-      <h3>How to Play</h3>
-      <ul>
-        <li><strong>Tap anywhere on the screen</strong> to jump over obstacles</li>
-        <li>Avoid hitting obstacles to survive</li>
-        <li>Game speed increases over time</li>
-        <li>Longer survival = higher score!</li>
-      </ul>
-    </div>
-    
-    <button class="start-btn" onclick="startGame()">START GAME</button>
-  </div>
+  <script src="script.js"></script>
 
-  <div id="rotateNotice">
-    <div class="rotate-icon">↻</div>
-    <p>Please rotate your device to landscape mode</p>
-    <p>Then tap to continue</p>
-  </div>
-
-  <div class="game-stats">
-    <div class="stat" id="scoreDisplay">Score: 0</div>
-    <div class="stat" id="speedDisplay">Speed: 1.00</div>
-  </div>
-
-  <div class="volume-control">
-    <div class="volume-btn" id="volDown">-</div>
-    <div class="volume-btn" id="volUp">+</div>
-  </div>
-
-  <div class="touch-notice" id="touchNotice"></div>
-  
-  <div class="credit">Developed by Toha</div>
-  
-  <div class="controls">
-    <div class="control-btn jump-btn" id="jumpBtn">↑</div>
-  </div>
-
-    <script src="script.js"></script>
 </body>
 </html>
