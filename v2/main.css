@@ -1,0 +1,60 @@
+  <style>
+    /* Reset margins and disable scrolling */
+    body {
+      margin: 0;
+      overflow: hidden;
+    }
+
+    /* Full‐screen canvas */
+    canvas {
+      display: block;
+      touch-action: none;
+    }
+
+    /* Start overlay shown before game begins */
+    .overlay {
+      position: absolute;
+      top: 0; 
+      left: 0;
+      width: 100%; 
+      height: 100%;
+      background: rgba(0, 0, 0, 0.5);
+      color: white;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 2rem;
+      cursor: pointer;
+      z-index: 10;
+      user-select: none;
+    }
+
+    /* Landscape‐only rotate notice hidden by default */
+    #rotateNotice {
+      position: absolute;
+      top: 0; 
+      left: 0;
+      width: 100%; 
+      height: 100%;
+      background: rgba(0, 0, 0, 0.85);
+      color: white;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      padding: 1rem;
+      font-size: calc(16px + 2vw);
+      line-height: 1.2;
+      z-index: 20;
+      display: none;
+    }
+
+    /* Portrait mode: show rotate notice, hide start overlay */
+    @media screen and (orientation: portrait) {
+      #rotateNotice {
+        display: flex;
+      }
+      .overlay {
+        display: none !important;
+      }
+    }
+  </style>

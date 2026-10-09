@@ -1,60 +1,30 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Calculator</title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-
-    <link rel="stylesheet" href="styles.css" />
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no"/>
+  <meta name="screen-orientation" content="landscape"/>
+  <title>KiPi re.web</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Titan+One&family=Outfit:wght@400;600;700&display=swap" rel="stylesheet">
 
 </head>
 <body>
-    <div class="calculator-container">
-        <div class="calculator-header">
-            <div class="app-title">Calculator</div>
-            <button class="theme-toggle" id="themeToggle">
-                <i class="fas fa-moon"></i>
-            </button>
-        </div>
-        
-        <div class="display">
-            <div class="previous-operand"></div>
-            <div class="current-operand">0</div>
-        </div>
-        
-        <div class="buttons-grid">
-            <button class="clear span-two">AC</button>
-            <button class="delete">DEL</button>
-            <button class="operation">÷</button>
-            
-            <button>7</button>
-            <button>8</button>
-            <button>9</button>
-            <button class="operation">×</button>
-            
-            <button>4</button>
-            <button>5</button>
-            <button>6</button>
-            <button class="operation">-</button>
-            
-            <button>1</button>
-            <button>2</button>
-            <button>3</button>
-            <button class="operation">+</button>
-            
-            <button class="span-two">0</button>
-            <button>.</button>
-            <button class="equals">=</button>
-        </div>
-        
-        <div class="calculator-footer">
-            <div class="memory-indicator" id="memoryIndicator">
-                <i class="fas fa-memory"></i> <span></span>
-        </div>
+<canvas id="gameCanvas"></canvas>
 
-    
-  <script src="script.js"></script>
+<div id="hudButtons">
+  <div class="iconBtn" id="btnPause" style="display:none" title="Pause (P)">
+    <svg viewBox="0 0 24 24" id="icoPause"><path d="M9 5v14M15 5v14"/></svg>
+    <svg viewBox="0 0 24 24" id="icoResume" style="display:none"><path d="M8 5l11 7-11 7z"/></svg>
+  </div>
+  <div class="iconBtn" id="btnAudio" title="Sound (M)">
+    <svg viewBox="0 0 24 24" id="icoSoundOn"><path d="M4 9v6h4l5 4V5L8 9H4z"/><path d="M16.5 8.5a5 5 0 0 1 0 7M19 6a8.5 8.5 0 0 1 0 12"/></svg>
+    <svg viewBox="0 0 24 24" id="icoSoundOff" style="display:none"><path d="M4 9v6h4l5 4V5L8 9H4z"/><path d="M17 9l5 6M22 9l-5 6"/></svg>
+  </div>
+</div>
 
+<div id="rotateNotice">Rotate your device to landscape to play.</div>
+    <link rel="stylesheet" href="main.css">
+    <script src="script.js"></script>
 </body>
 </html>

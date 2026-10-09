@@ -1,0 +1,21 @@
+
+    html, body { margin: 0; height: 100%; overflow: hidden; background: #140d13; }
+    canvas { display: block; touch-action: none; }
+
+    #hudButtons { position: fixed; top: 12px; right: 12px; display: flex; gap: 10px; z-index: 20; }
+    .iconBtn {
+      width: 44px; height: 44px; border-radius: 50%;
+      border: 2px solid rgba(255,233,214,.35);
+      background: rgba(20,12,18,.35); color: #ffe9d6;
+      display: flex; align-items: center; justify-content: center;
+      cursor: pointer; -webkit-tap-highlight-color: transparent; backdrop-filter: blur(4px);
+    }
+    .iconBtn:active { transform: scale(.92); }
+    .iconBtn svg { width: 22px; height: 22px; fill: none; stroke: currentColor; stroke-width: 2.4; stroke-linecap: round; stroke-linejoin: round; }
+
+    #rotateNotice {
+      position: fixed; inset: 0; background: #140d13; color: #ffe9d6;
+      display: none; align-items: center; justify-content: center; text-align: center;
+      padding: 1.5rem; font-family: Outfit, sans-serif; font-size: clamp(16px, 3.5vw, 26px); z-index: 30;
+    }
+    @media screen and (orientation: portrait) { #rotateNotice { display: flex; } }
